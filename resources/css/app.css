@@ -1,0 +1,40 @@
+
+@import 'tailwindcss' ;
+@plugin 'daisyui' ;
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/* @theme {
+    --font-sans:
+        'Kanit', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+} */
+@theme {
+  /* กำหนดค่าตัวแปรใหม่ โดยเอา Kanit ขึ้นก่อน */
+  --font-kanit: "Kanit", sans-serif;
+}
+/* บังคับให้ Tailwind v4 ใช้ระบบ Class สำหรับ Dark Mode */
+@variant dark (&:where(.dark, .dark *));
+@layer base {
+    body {
+        @apply transition-colors duration-300;
+        font-family: var(--font-sans);
+        /* ถ้าต้องการให้ตัวหนังสือดูเนียนขึ้นบนจอ Mac/iOS */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+.sidebar {
+    min-height: calc(100vh - 80px);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #373737 inset;
+    -webkit-text-fill-color: #ffffff;
+    transition: background-color 5000s ease-in-out 0s;
+}
