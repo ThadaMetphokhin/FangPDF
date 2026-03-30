@@ -58,7 +58,7 @@ jobs:
           git add -f vendor/
           git add -A
           git commit -m "deploy: production build $(date +'%Y-%m-%d %H:%M:%S')"
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote add origin https://x-access-token:${{ secrets.MY_GIT_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin HEAD:prod --force
 
       #  CyberPanel ดึงโค้ดล่าสุด 
