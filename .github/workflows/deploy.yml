@@ -1,0 +1,67 @@
+name: FangPDF-Main-To-Prod
+
+on:
+  push:
+    branches:
+      - develop 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      #ติดตั้งสภาพแวดล้อม PHP 8.2 และ Node.js
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, bcmath, gd, zip
+
+      - name: Install & Build Assets (React/Vite/Tailwind)
+        run: |
+          composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+          npm install
+          npm run build
+
+      # ปรับโครงสร้างไฟล์
+      - name: Restructure Folders
+        run: |
+          mkdir ../prod_temp
+          cp -r . ../prod_temp/
+          cd ../prod_temp
+          rm -rf public/storage
+          # คัดลอกไฟล์จาก public ออกมาด้านนอกทั้งหมด
+          cp -r public/. . 
+          # แก้ไขพาธใน index.php ให้เรียกไฟล์จากตำแหน่งใหม่
+          sed -i "s|require __DIR__.'/../vendor/autoload.php'|require __DIR__.'/vendor/autoload.php'|g" index.php
+          sed -i "s|require_once __DIR__.'/../bootstrap/app.php'|require_once __DIR__.'/bootstrap/app.php'|g" index.php
+          # ลบโฟลเดอร์ public ทิ้ง
+          rm -rf public tests node_modules .git .github
+          rm -f vite.config.ts tsconfig.json package.json package-lock.json
+          rm -f eslint.config.js pint.json phpunit.xml .editorconfig 
+          rm -f .env.example
+          rm -f .env
+      # ส่งไฟล์ที่พร้อมรันไปที่ Branch prod
+      - name: Push to Prod Branch
+        run: |
+          cd ../prod_temp
+          git init
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f vendor/
+          git add -A
+          git commit -m "deploy: production build $(date +'%Y-%m-%d %H:%M:%S')"
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin HEAD:prod --force
+
+      #  CyberPanel ดึงโค้ดล่าสุด 
+      - name: Trigger CyberPanel Update
+        run: |
+          curl -k -X POST "${{ secrets.DEVELOP_WEBHOOK_URL }}"
