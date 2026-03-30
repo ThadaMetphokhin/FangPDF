@@ -66,7 +66,7 @@ export default function LoginPage() {
                         {/* <!-- หัวข้อ Login --> */}
                         <div className="mb-10 text-center">
                             <h1 className="mb-3 text-3xl font-[1000] text-[#990000] antialiased dark:text-[#D3DAD9]">
-                                เข้าสู่ระบบ test  final last
+                                เข้าสู่ระบบ successs
                             </h1>
                             <p className="text-lg dark:text-[#D3DAD9]">
                                 สำหรับบุคลากร วิทยาลัยการอาชีพฝาง
